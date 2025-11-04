@@ -229,12 +229,13 @@ def main():
 
             # Add overlays to resized annotated frame
             if annotated is not None:
-                # Display maximum object counts from last 30 frames
-                y0 = 60
+                # Display maximum object counts from last 30 frames at BOTTOM LEFT
+                height = annotated.shape[0]
+                y0 = height - 30  # Start from bottom
                 for obj, count in max_counts.items():
                     cv2.putText(annotated, f"{obj}: {count}", (20, y0),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
-                    y0 += 25
+                    y0 -= 25  # Move UP for next line
 
                 # SHARE THE RESIZED FRAME with the streaming server
                 frame_manager.update_frame1(annotated)

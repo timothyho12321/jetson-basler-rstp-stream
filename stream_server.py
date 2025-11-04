@@ -299,19 +299,20 @@ class DualStreamHandler(BaseHTTPRequestHandler):
         """Add overlay for combined stream"""
         current_sgt = self.get_sgt_time()
         
-        cv2.putText(combined_frame, "DUAL STREAM ", (10, 30),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+        # Place stream info at TOP LEFT
+        cv2.putText(combined_frame, "DUAL STREAM", (10, 30),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
         cv2.putText(combined_frame, f"Time: {current_sgt}", (10, 60), 
                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
         cv2.putText(combined_frame, f"Client Frames: {client_frame_count}", (10, 90), 
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
         
         # Add divider line
         height = combined_frame.shape[0]
         cv2.line(combined_frame, (640, 0), (640, height), (255, 255, 255), 2)
-        cv2.putText(combined_frame, "STREAM 1", (250, height-20), 
+        cv2.putText(combined_frame, "STREAM 1", (250, height-10), 
                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 200, 255), 1)
-        cv2.putText(combined_frame, "STREAM 2", (900, height-20), 
+        cv2.putText(combined_frame, "STREAM 2", (900, height-10), 
                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 200), 1)
     
     def handle_root(self):
