@@ -24,7 +24,7 @@ def open_basler_camera(index=0):
     camera.Open()
 
     # Disable buffering and always grab the latest frame
-    camera.MaxNumBuffer = 15
+    camera.MaxNumBuffer = 5
     camera.StartGrabbing(pylon.GrabStrategy_LatestImageOnly)
     return camera
 
@@ -174,6 +174,10 @@ def main():
     prev_time = 0
     frame_count = 0
     fps_history = []
+    
+    # Track counts over last 30 frames for smoothing
+    counts_history = []  # List of Counter objects from last 30 frames
+    max_history_size = 30
 
     print("[INFO] Starting YOLO detection and frame sharing...")
     print("[INFO] Press Ctrl+C to stop")
@@ -194,6 +198,17 @@ def main():
             class_names = [results[0].names[int(cls)] for cls in names]
             
             counts = Counter(class_names)
+            
+            # Add current counts to history
+            counts_history.append(counts)
+            if len(counts_history) > max_history_size:
+                counts_history.pop(0)
+            
+            # Calculate max counts over the history window
+            max_counts = Counter()
+            for hist_count in counts_history:
+                for obj, count in hist_count.items():
+                    max_counts[obj] = max(max_counts.get(obj, 0), count)
 
             # Draw annotations on ORIGINAL high-resolution frame first
             annotated_high_res = results[0].plot()
@@ -214,9 +229,9 @@ def main():
 
             # Add overlays to resized annotated frame
             if annotated is not None:
-                # Display object counts
+                # Display maximum object counts from last 30 frames
                 y0 = 60
-                for obj, count in counts.items():
+                for obj, count in max_counts.items():
                     cv2.putText(annotated, f"{obj}: {count}", (20, y0),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
                     y0 += 25
